@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>현도 지은 여행 중</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF1EF;
+    --ink:#1F2421;
+    --ink-soft:#6b716a;
+    --card:#FFFFFF;
+    --accent:#D9697D;
+    --accent-2:#B23A55;
+    --line:rgba(31,36,33,0.14);
+    --radius:16px;
+    --serif:'맑은 고딕', 'Malgun Gothic', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    --sans:'맑은 고딕', 'Malgun Gothic', -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  *:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px;border-radius:4px;}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+  body{padding-bottom:48px;transition:background .2s;}
+  .wrap{max-width:460px;margin:0 auto;padding:0;}
+
+  header{position:sticky;top:0;z-index:20;background:var(--paper);transition:background .2s;padding-bottom:12px;}
+  .head-row{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 12px;}
+  .logo{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:.2px;}
+  .icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);padding:0;flex:none;}
+  .icon-btn svg{width:18px;height:18px;}
+  .stripe{height:2px;background:var(--accent);}
+
+  
+
+  main{padding-top:6px;}
+  .feed{display:flex;flex-direction:column;gap:20px;padding:18px 0 22px;}
+  .postcard{background:var(--card);overflow:hidden;margin:0 10px;}
+  @media (prefers-reduced-motion:no-preference){
+    .postcard.is-new{animation:riseIn .35s ease-out;}
+    @keyframes riseIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  }
+  .media{position:relative;width:100%;background:var(--paper);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:var(--radius);}
+  .shadow-strip{height:14px;margin:-8px 10px 0;background:linear-gradient(to bottom, rgba(31,36,33,.16), rgba(31,36,33,0));}
+  .media img,.media video{width:100%;height:100%;object-fit:cover;display:block;}
+  .media svg{width:34px;height:34px;color:var(--ink-soft);opacity:.55;}
+  .video-badge{position:absolute;top:10px;left:10px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;}
+  .video-badge svg{width:11px;height:11px;color:#1F2421;}
+  .yt-wrap{position:relative;width:100%;height:100%;cursor:pointer;}
+  .yt-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+  .yt-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:rgba(31,36,33,.6);display:flex;align-items:center;justify-content:center;}
+  .yt-play svg{width:20px;height:20px;color:#fff;}
+  .body{padding:14px 18px 18px;}
+  .meta{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;gap:10px;}
+  .meta .loc{display:flex;align-items:center;gap:4px;min-width:0;}
+  .meta .loc svg{width:13px;height:13px;flex:none;}
+  .meta .loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:700;color:var(--ink);}
+  .meta time{flex:none;}
+  .meta-right{display:flex;align-items:center;gap:8px;flex:none;}
+  .icon-mini{width:22px;height:22px;border:none;background:none;padding:0;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);cursor:pointer;flex:none;}
+  .icon-mini svg{width:15px;height:15px;}
+  .icon-mini:hover{color:var(--ink);}
+  .text-btn{background:none;border:none;padding:0;margin:0;font-size:12px;color:var(--ink-soft);cursor:pointer;font-family:var(--sans);text-decoration:underline;text-decoration-color:var(--line);}
+  .caption{font-family:var(--serif);font-size:16px;line-height:1.65;margin:0;white-space:pre-line;}
+
+  .sentinel{text-align:center;padding:16px 16px 6px;font-size:13px;color:var(--ink-soft);}
+  .sentinel svg{width:16px;height:16px;display:block;margin:0 auto 6px;}
+
+  .fab{position:fixed;bottom:22px;right:22px;width:58px;height:58px;border-radius:50%;background:var(--accent);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.18);z-index:30;}
+  .fab svg{width:24px;height:24px;color:#fff;}
+
+  .overlay{position:fixed;inset:0;background:rgba(31,36,33,.45);display:none;align-items:flex-end;justify-content:center;z-index:40;}
+  .overlay.open{display:flex;}
+  .sheet{background:var(--card);width:100%;max-width:460px;border-radius:20px 20px 0 0;padding:20px 20px 28px;max-height:85vh;overflow-y:auto;}
+  @media (prefers-reduced-motion:no-preference){
+    .sheet{animation:slideUp .25s ease-out;}
+    @keyframes slideUp{from{transform:translateY(24px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+  }
+  .sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .drop{display:block;border:1.5px dashed var(--line);border-radius:12px;padding:22px;text-align:center;cursor:pointer;color:var(--ink-soft);margin-bottom:14px;}
+  .drop.has-file{padding:0;border-style:solid;overflow:hidden;}
+  .or-sep{text-align:center;font-size:12px;color:var(--ink-soft);margin:6px 0;}
+  .field-error{font-size:12px;color:var(--accent-2);margin:6px 2px 0;}
+  #dropPreview img,#dropPreview video{width:100%;max-height:300px;object-fit:cover;display:block;}
+  label.field{display:block;font-size:13px;color:var(--ink-soft);margin:14px 0 6px;}
+  input[type=text],input[type=password],textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--sans);font-size:15px;color:var(--ink);background:var(--paper);}
+  textarea{min-height:64px;resize:vertical;}
+  .submit{width:100%;margin-top:18px;padding:14px;border:none;border-radius:12px;background:var(--accent);color:#fff;font-family:var(--sans);font-weight:500;font-size:15px;cursor:pointer;}
+  .submit:disabled{opacity:.4;cursor:not-allowed;}
+
+  @media (min-width:600px){
+    .wrap{max-width:920px;padding:0 24px;}
+    .head-row{padding:18px 0 12px;}
+    .sentinel{padding:16px 0 6px;}
+    .postcard{border:1px solid var(--line);border-radius:var(--radius);}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="head-row">
+      <span class="logo">현도 지은 여행 중</span>
+    </div>
+    <div class="stripe"></div>
+  </header>
+
+  <main>
+    <div class="feed" id="feed"><p id="loadingMsg" style="text-align:center;color:var(--ink-soft);font-size:13px;padding:30px 0;">기억을 불러오는 중...</p></div>
+    <div class="sentinel" id="sentinel">
+      <svg id="sentinelIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      <span id="sentinelText">스크롤하면 지난 기록이 이어져요</span>
+    </div>
+  </main>
+</div>
+
+<button class="fab" id="fabBtn" aria-label="새 기록 남기기">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
+
+<div class="overlay" id="loginOverlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <span class="logo" style="font-size:17px;">로그인</span>
+      <button class="icon-btn" id="closeLogin" type="button" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <label class="field" for="loginEmail">이메일</label>
+    <input type="text" id="loginEmail" placeholder="이메일" autocomplete="username">
+    <label class="field" for="loginPassword">비밀번호</label>
+    <input type="password" id="loginPassword" placeholder="비밀번호" autocomplete="current-password">
+    <p class="field-error" id="loginError" style="display:none;">이메일 또는 비밀번호를 확인해주세요</p>
+    <button class="submit" id="loginSubmitBtn" type="button">로그인</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sheet-head">
+      <span class="logo" id="sheetTitle" style="font-size:17px;">새 기록</span>
+      <button class="icon-btn" id="closeSheet" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>
+      </button>
+    </div>
+    <div id="mediaPickGroup">
+      <label class="drop" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;">
+        <div id="dropPreview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:26px;height:26px;margin-bottom:6px;"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.4-2.4h5.2L16 7"/><circle cx="12" cy="13.5" r="3.2"/></svg>
+          <div>사진 또는 동영상 직접 선택</div>
+        </div>
+      </label>
+      <p id="ytUploadStatus" style="display:none;font-size:12px;color:var(--ink-soft);margin:8px 2px 0;"></p>
+      <button class="text-btn" id="removeMediaBtn" type="button" style="display:none;margin-top:8px;">현재 사진/영상 제거</button>
+      <div class="or-sep">또는</div>
+      <label class="field" for="ytInput">유튜브 영상 링크</label>
+      <input type="text" id="ytInput" placeholder="https://youtu.be/...">
+      <p class="field-error" id="ytError" style="display:none;">링크를 확인해주세요</p>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);margin:12px 2px 0;cursor:pointer;">
+        <input type="checkbox" id="verticalToggle" style="width:auto;flex:none;"> 세로형(쇼츠·세로 영상)으로 표시
+      </label>
+    </div>
+    <label class="field" for="locInput">어디였나요?</label>
+    <input type="text" id="locInput" placeholder="예: 포르투갈 · 리스보아">
+    <label class="field" for="capInput">짧은 한마디</label>
+    <textarea id="capInput" placeholder="이 순간을 한 줄로 남겨보세요"></textarea>
+    <p id="mediaHint" style="font-size:12px;color:var(--ink-soft);margin:10px 2px 0;">사진과 유튜브 링크는 그대로 저장돼요. 동영상을 직접 선택하면 지금 화면에서만 보이고, 새로고침하면 글과 위치만 남아요.</p>
+    <button class="submit" id="submitBtn" disabled>기록 남기기</button>
+  </div>
+</div>
+
+<script type="module">
+/* ============================================================
+   여기에 두 분의 Firebase 설정값을 붙여넣으세요.
+   Firebase 콘솔 > 프로젝트 설정(⚙️) > 일반 탭 > 내 앱 > 웹 앱
+   ============================================================ */
+var firebaseConfig = {
+  apiKey: "AIzaSyBT4VvFS4H9QwlNjfVjKMGo_mVciTsoQdc",
+  authDomain: "dowzen-website.firebaseapp.com",
+  projectId: "dowzen-website",
+  storageBucket: "dowzen-website.firebasestorage.app",
+  messagingSenderId: "358254321873",
+  appId: "1:358254321873:web:3b8d6b2763adbdb07025f0"
+};
+/* ============================================================ */
+
+var isConfigured = firebaseConfig.apiKey.indexOf('YOUR_') !== 0;
+
+/* ============================================================
+   동영상을 직접 고르면 자동으로 유튜브에 올리는 기능을 쓰려면
+   여기에 구글 클라우드에서 만든 OAuth 클라이언트 ID를 붙여넣으세요.
+   (비워두면 동영상은 예전처럼 화면에서만 보이는 임시 미리보기로 남습니다)
+   ============================================================ */
+var YOUTUBE_CLIENT_ID = "358254321873-d2cp84abeoqgbt0t29icrgeodor1lgci.apps.googleusercontent.com";
+/* ============================================================ */
+var isYoutubeConfigured = YOUTUBE_CLIENT_ID.indexOf('YOUR_') !== 0;
+var db=null, auth=null;
+var collection, getDocs, doc, setDoc, updateDoc, deleteDoc, signInWithEmailAndPassword, onAuthStateChanged, signOut;
+
+function initFirebase(){
+  if(!isConfigured) return Promise.resolve();
+  return Promise.all([
+    import("https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js"),
+    import("https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js")
+  ]).then(function(mods){
+    var appMod=mods[0], fsMod=mods[1], authMod=mods[2];
+    var app=appMod.initializeApp(firebaseConfig);
+    db=fsMod.getFirestore(app);
+    auth=authMod.getAuth(app);
+    collection=fsMod.collection; getDocs=fsMod.getDocs; doc=fsMod.doc; setDoc=fsMod.setDoc; updateDoc=fsMod.updateDoc; deleteDoc=fsMod.deleteDoc;
+    signInWithEmailAndPassword=authMod.signInWithEmailAndPassword; onAuthStateChanged=authMod.onAuthStateChanged; signOut=authMod.signOut;
+  }).catch(function(err){
+    console.error('Firebase 초기화 실패, 데모 모드로 표시합니다.', err);
+    isConfigured=false;
+  });
+}
+
+initFirebase().then(function(){
+(function(){
+  var ALL_POSTS=[];
+  var BATCH=3, shown=0;
+  var feed=document.getElementById('feed');
+  var sentinel=document.getElementById('sentinel');
+  var sentinelText=document.getElementById('sentinelText');
+
+  function iconCamera(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.4-2.4h5.2L16 7"/><circle cx="12" cy="13.5" r="3.2"/></svg>';}
+  function iconPlay(){return '<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg>';}
+  function iconPin(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-7.2-7-12a7 7 0 1 1 14 0c0 4.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.2"/></svg>';}
+  function iconEdit(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';}
+  function iconTrash(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';}
+
+  function extractYouTubeId(text){
+    if(!text) return null;
+    text=text.trim();
+    if(/^[a-zA-Z0-9_-]{11}$/.test(text)) return text;
+    var patterns=[
+      /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+      /[?&]v=([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+      /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/
+    ];
+    for(var i=0;i<patterns.length;i++){
+      var m=text.match(patterns[i]);
+      if(m) return m[1];
+    }
+    return null;
+  }
+
+  function isYouTubeShorts(text){
+    return !!(text && /youtube\.com\/shorts\//.test(text));
+  }
+
+  function relTime(ts){
+    var diff=Date.now()-ts;
+    var min=60000, hour=3600000, day=86400000;
+    if(diff<min*5) return '방금';
+    if(diff<hour) return Math.max(1,Math.floor(diff/min))+'분 전';
+    if(diff<day) return Math.max(1,Math.floor(diff/hour))+'시간 전';
+    var days=Math.floor(diff/day);
+    if(days<7) return days+'일 전';
+    if(days<30) return Math.floor(days/7)+'주 전';
+    if(days<60) return '한 달 전';
+    return Math.floor(days/30)+'개월 전';
+  }
+
+  function defaultSeeds(){
+    var now=Date.now(), day=86400000, hour=3600000;
+    return [
+      {id:'seed1',loc:'포르투갈 · 리스보아',caption:'노란 트램과 골목길, 둘이 걷기 딱 좋은 날이었다.',isVideo:false,ratio:'4/5',createdAt:now-6*hour,mediaData:null,youtubeId:null},
+      {id:'seed2',loc:'스페인 · 세비야',caption:'플라멩고 공연, 박수 소리가 아직도 귀에 남아있다.',isVideo:true,ratio:'16/9',createdAt:now-3*day,mediaData:null,youtubeId:null},
+      {id:'seed3',loc:'모로코 · 마라케시',caption:'시장 골목에서 길을 잃었지만, 그게 오히려 더 좋았다.',isVideo:false,ratio:'4/5',createdAt:now-7*day,mediaData:null,youtubeId:null},
+      {id:'seed4',loc:'아이슬란드 · 비크',caption:'검은 모래 해변, 바람이 정말 거셌다.',isVideo:false,ratio:'16/9',createdAt:now-14*day,mediaData:null,youtubeId:null},
+      {id:'seed5',loc:'일본 · 교토',caption:'이른 아침 대나무 숲길, 둘이서만 걷는 기분이었다.',isVideo:true,ratio:'4/5',createdAt:now-21*day,mediaData:null,youtubeId:null},
+      {id:'seed6',loc:'이탈리아 · 친퀘테레',caption:'파스텔 마을과 바다, 사진보다 실제가 더 예뻤다.',isVideo:false,ratio:'16/9',createdAt:now-30*day,mediaData:null,youtubeId:null},
+      {id:'seed7',loc:'태국 · 치앙마이',caption:'코끼리 보호구역에서 보낸 하루, 마음이 따뜻했다.',isVideo:false,ratio:'4/5',createdAt:now-31*day,mediaData:null,youtubeId:null},
+      {id:'seed8',loc:'페루 · 마추픽추',caption:'새벽 안개가 걷히던 순간, 말이 필요 없었다.',isVideo:false,ratio:'16/9',createdAt:now-60*day,mediaData:null,youtubeId:null},
+      {id:'seed9',loc:'그리스 · 산토리니',caption:'노을이 질 때마다 사람들이 약속한 듯 멈춰섰다.',isVideo:true,ratio:'4/5',createdAt:now-61*day,mediaData:null,youtubeId:null}
+    ];
+  }
+
+  function buildCard(p,isNew){
+    var wrap=document.createElement('div');
+    wrap.className='postcard'+(isNew?' is-new':'');
+    var media=document.createElement('div'); media.className='media';
+    media.style.aspectRatio=p.ratio||'4/5';
+    if(p.youtubeId){
+      var ytWrap=document.createElement('div'); ytWrap.className='yt-wrap';
+      var thumb=document.createElement('img'); thumb.alt='';
+      if(p.shorts){
+        thumb.src='https://i.ytimg.com/vi/'+p.youtubeId+'/oardefault.jpg';
+        thumb.onerror=function(){ thumb.onerror=null; thumb.src='https://i.ytimg.com/vi/'+p.youtubeId+'/hqdefault.jpg'; };
+      } else {
+        thumb.src='https://i.ytimg.com/vi/'+p.youtubeId+'/hqdefault.jpg';
+      }
+      var playBtn=document.createElement('div'); playBtn.className='yt-play'; playBtn.innerHTML=iconPlay();
+      ytWrap.appendChild(thumb); ytWrap.appendChild(playBtn);
+      ytWrap.addEventListener('click',function(){
+        var iframe=document.createElement('iframe');
+        iframe.src='https://www.youtube-nocookie.com/embed/'+p.youtubeId+'?autoplay=1&rel=0';
+        iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='0';
+        iframe.setAttribute('allow','autoplay; encrypted-media; picture-in-picture');
+        iframe.setAttribute('allowfullscreen','');
+        iframe.setAttribute('referrerpolicy','strict-origin-when-cross-origin');
+        media.innerHTML=''; media.appendChild(iframe);
+      });
+      media.appendChild(ytWrap);
+    } else {
+      var src=p.mediaURL||p.mediaData;
+      if(src){
+        if(p.isVideo){
+          var v=document.createElement('video'); v.src=src; v.controls=true; v.setAttribute('playsinline','');
+          media.appendChild(v);
+        } else {
+          var img=document.createElement('img'); img.src=src; img.alt='';
+          media.appendChild(img);
+        }
+      } else {
+        media.innerHTML=iconCamera();
+        if(p.isVideo){
+          var badge=document.createElement('div'); badge.className='video-badge'; badge.innerHTML=iconPlay();
+          media.appendChild(badge);
+        }
+      }
+    }
+    var shadowStrip=document.createElement('div'); shadowStrip.className='shadow-strip';
+    var body=document.createElement('div'); body.className='body';
+    var meta=document.createElement('div'); meta.className='meta';
+    var locSpan=document.createElement('span'); locSpan.className='loc'; locSpan.innerHTML=iconPin();
+    var locText=document.createElement('span'); locText.textContent=p.loc; locSpan.appendChild(locText);
+    var metaRight=document.createElement('div'); metaRight.className='meta-right';
+    var timeEl=document.createElement('time'); timeEl.textContent=relTime(p.createdAt);
+    var editBtn=document.createElement('button'); editBtn.type='button'; editBtn.className='icon-mini'; editBtn.setAttribute('aria-label','수정'); editBtn.innerHTML=iconEdit();
+    editBtn.addEventListener('click',function(){ requireAuth(function(){ openEditSheet(p,wrap); }); });
+    var delBtn=document.createElement('button'); delBtn.type='button'; delBtn.className='icon-mini'; delBtn.setAttribute('aria-label','삭제'); delBtn.innerHTML=iconTrash();
+    delBtn.addEventListener('click',function(){ requireAuth(function(){ deletePost(p,wrap); }); });
+    metaRight.appendChild(timeEl); metaRight.appendChild(editBtn); metaRight.appendChild(delBtn);
+    meta.appendChild(locSpan); meta.appendChild(metaRight);
+    var cap=document.createElement('p'); cap.className='caption'; cap.textContent=p.caption;
+    body.appendChild(meta); body.appendChild(cap);
+    wrap.appendChild(media); wrap.appendChild(shadowStrip); wrap.appendChild(body);
+    return wrap;
+  }
+
+  function loadMore(){
+    var next=ALL_POSTS.slice(shown,shown+BATCH);
+    next.forEach(function(p){ feed.appendChild(buildCard(p,false)); });
+    shown+=next.length;
+    if(shown>=ALL_POSTS.length){
+      var ic=document.getElementById('sentinelIcon'); if(ic) ic.remove();
+      sentinelText.textContent='처음 기록까지 다 둘러보셨어요';
+      observer.disconnect();
+    }
+  }
+  var observer=new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting && shown<ALL_POSTS.length){ setTimeout(loadMore,200); }
+  },{rootMargin:'200px'});
+
+  function fetchAllPosts(){
+    return getDocs(collection(db,'posts')).then(function(snap){
+      var posts=[];
+      snap.forEach(function(d){ posts.push(Object.assign({id:d.id}, d.data())); });
+      return posts;
+    });
+  }
+
+  function seedPosts(){
+    var seeds=defaultSeeds();
+    var jobs=seeds.map(function(s){
+      var data=Object.assign({}, s);
+      delete data.id;
+      return setDoc(doc(db,'posts',s.id), data).catch(function(){});
+    });
+    return Promise.all(jobs).then(function(){ return seeds; });
+  }
+
+  function init(){
+    var ready;
+    if(isConfigured){
+      ready=fetchAllPosts().then(function(posts){
+        if(posts.length===0) return seedPosts();
+        return posts;
+      }).catch(function(){ return defaultSeeds(); });
+    } else {
+      ready=Promise.resolve(defaultSeeds());
+    }
+    ready.then(function(posts){
+      posts.sort(function(a,b){ return b.createdAt-a.createdAt; });
+      ALL_POSTS=posts;
+      var lm=document.getElementById('loadingMsg'); if(lm) lm.remove();
+      loadMore();
+      observer.observe(sentinel);
+    });
+  }
+  init();
+
+  // ---- 로그인: 두 분만 업로드/수정/삭제 가능, 그 외엔 열람만 ----
+  var loginOverlay=document.getElementById('loginOverlay');
+  var closeLoginBtn=document.getElementById('closeLogin');
+  var loginEmail=document.getElementById('loginEmail');
+  var loginPassword=document.getElementById('loginPassword');
+  var loginError=document.getElementById('loginError');
+  var loginSubmitBtn=document.getElementById('loginSubmitBtn');
+  var pendingAction=null;
+
+  function openLogin(action){
+    pendingAction=action||null;
+    loginError.style.display='none';
+    loginOverlay.classList.add('open');
+  }
+  function closeLogin(){ loginOverlay.classList.remove('open'); pendingAction=null; }
+  closeLoginBtn.addEventListener('click',closeLogin);
+  loginOverlay.addEventListener('click',function(e){ if(e.target===loginOverlay) closeLogin(); });
+
+  loginSubmitBtn.addEventListener('click',function(){
+    signInWithEmailAndPassword(auth, loginEmail.value.trim(), loginPassword.value)
+      .then(function(){
+        loginEmail.value=''; loginPassword.value='';
+        loginOverlay.classList.remove('open');
+        var act=pendingAction; pendingAction=null;
+        if(act) act();
+      })
+      .catch(function(){ loginError.style.display='block'; });
+  });
+
+  function requireAuth(action){
+    if(!isConfigured){ action(); return; }
+    if(auth.currentUser){ action(); return; }
+    openLogin(action);
+  }
+
+  // ---- 업로드 시트 ----
+  var fabBtn=document.getElementById('fabBtn');
+  var overlay=document.getElementById('overlay');
+  var closeSheetBtn=document.getElementById('closeSheet');
+  var sheetTitle=document.getElementById('sheetTitle');
+  var mediaPickGroup=document.getElementById('mediaPickGroup');
+  var mediaHint=document.getElementById('mediaHint');
+  var removeMediaBtn=document.getElementById('removeMediaBtn');
+
+  var editingId=null, editingCardEl=null, editingMediaCleared=false;
+  function resetEditState(){
+    editingId=null; editingCardEl=null; editingMediaCleared=false;
+    sheetTitle.textContent='새 기록';
+    submitBtn.textContent='기록 남기기';
+    mediaPickGroup.style.display='';
+    mediaHint.style.display='';
+    removeMediaBtn.style.display='none';
+  }
+  function openEditSheet(p,cardEl){
+    editingId=p.id; editingCardEl=cardEl; editingMediaCleared=false;
+    locInput.value=p.loc; capInput.value=p.caption;
+    sheetTitle.textContent='기록 수정';
+    submitBtn.textContent='수정 완료';
+    mediaPickGroup.style.display='';
+    resetDrop();
+    if(p.youtubeId){
+      ytInput.value = p.shorts ? ('https://youtube.com/shorts/'+p.youtubeId) : ('https://youtu.be/'+p.youtubeId);
+    } else if(p.mediaData){
+      dropZone.classList.add('has-file');
+      dropPreview.innerHTML='';
+      var img=document.createElement('img'); img.src=p.mediaData; img.alt='';
+      dropPreview.appendChild(img);
+    }
+    removeMediaBtn.style.display=(p.youtubeId||p.mediaData)?'':'none';
+    if(verticalToggle) verticalToggle.checked=!!p.shorts;
+    checkSubmit();
+    openUpload();
+  }
+  removeMediaBtn.addEventListener('click',function(){
+    editingMediaCleared=true;
+    resetDrop();
+    removeMediaBtn.style.display='none';
+  });
+  function deletePost(p,cardEl){
+    if(!window.confirm('이 기록을 삭제할까요?')) return;
+    cardEl.remove();
+    var idx=ALL_POSTS.findIndex(function(x){ return x.id===p.id; });
+    if(idx>-1) ALL_POSTS.splice(idx,1);
+    shown=Math.max(0,shown-1);
+    if(isConfigured){
+      deleteDoc(doc(db,'posts',p.id)).catch(function(){});
+    }
+  }
+
+  function openUpload(){ overlay.classList.add('open'); }
+  function closeUpload(){
+    if(ytUploading){ window.alert('유튜브 업로드가 끝날 때까지 잠시만 기다려주세요.'); return; }
+    overlay.classList.remove('open'); resetEditState();
+  }
+  fabBtn.addEventListener('click',function(){ requireAuth(openUpload); });
+  closeSheetBtn.addEventListener('click',closeUpload);
+  overlay.addEventListener('click',function(e){ if(e.target===overlay) closeUpload(); });
+
+  var fileInput=document.getElementById('fileInput');
+  var dropZone=document.getElementById('dropZone');
+  var dropPreview=document.getElementById('dropPreview');
+  var ytInput=document.getElementById('ytInput');
+  var verticalToggle=document.getElementById('verticalToggle');
+  var ytError=document.getElementById('ytError');
+  var ytUploadStatus=document.getElementById('ytUploadStatus');
+  var locInput=document.getElementById('locInput');
+  var capInput=document.getElementById('capInput');
+  var submitBtn=document.getElementById('submitBtn');
+  var chosenURL=null, chosenIsVideo=false, chosenRatio=null, chosenCompressed=null;
+  var chosenYoutubeId=null, ytUploading=false;
+  var ytAccessToken=null, ytTokenClient=null;
+
+  var gsiLoadPromise=null;
+  function loadGsi(){
+    if(gsiLoadPromise) return gsiLoadPromise;
+    gsiLoadPromise=new Promise(function(resolve,reject){
+      var s=document.createElement('script');
+      s.src='https://accounts.google.com/gsi/client';
+      s.onload=resolve; s.onerror=reject;
+      document.head.appendChild(s);
+    });
+    return gsiLoadPromise;
+  }
+
+  var ytAuthOnReady=null, ytAuthOnFail=null, ytAuthDone=false;
+  function ensureYoutubeAuth(onReady, onFail){
+    if(ytAccessToken){ onReady(); return; }
+    // 매 시도마다 최신 콜백을 사용 (토큰 클라이언트는 재사용되므로 밖에 저장)
+    ytAuthOnReady=onReady; ytAuthOnFail=onFail; ytAuthDone=false;
+    function finishOk(){ if(ytAuthDone) return; ytAuthDone=true; if(ytAuthOnReady) ytAuthOnReady(); }
+    function finishFail(msg){ if(ytAuthDone) return; ytAuthDone=true; if(ytAuthOnFail) ytAuthOnFail(msg); }
+    function startTokenFlow(){
+      if(!(window.google && window.google.accounts && window.google.accounts.oauth2)){
+        finishFail('구글 인증 모듈이 아직 준비되지 않았어요. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+      if(!ytTokenClient){
+        ytTokenClient=google.accounts.oauth2.initTokenClient({
+          client_id: YOUTUBE_CLIENT_ID,
+          scope: 'https://www.googleapis.com/auth/youtube.upload',
+          callback: function(resp){
+            if(resp && resp.access_token){ ytAccessToken=resp.access_token; finishOk(); }
+            else if(resp && resp.error){ finishFail('권한 거부됨: '+resp.error); }
+            else { finishFail('유튜브 권한 응답을 받지 못했어요.'); }
+          },
+          error_callback: function(err){
+            var type=(err&&err.type)||'';
+            var msg='유튜브 권한 창을 열지 못했어요.';
+            if(type==='popup_closed') msg='권한 창이 닫혔어요. 다시 시도해주세요.';
+            else if(type==='popup_failed_to_open') msg='팝업이 차단됐어요. 브라우저 팝업 차단을 해제한 뒤 다시 시도해주세요.';
+            else if(type) msg='권한 처리 중 오류('+type+'). 등록된 도메인/테스트 사용자 설정을 확인해주세요.';
+            finishFail(msg);
+          }
+        });
+      }
+      // 권한 창이 끝까지 응답 없이 멈추는 경우를 대비한 안전장치
+      setTimeout(function(){ finishFail('권한 확인이 시간 내에 끝나지 않았어요. 팝업 차단/도메인 등록을 확인해주세요.'); }, 60000);
+      ytTokenClient.requestAccessToken();
+    }
+    if(window.google && window.google.accounts && window.google.accounts.oauth2){ startTokenFlow(); return; }
+    loadGsi().then(startTokenFlow).catch(function(){
+      finishFail('구글 인증 모듈을 불러오지 못했어요. 잠시 후 다시 시도해주세요.');
+    });
+  }
+
+  function uploadVideoToYoutube(file, onProgress, onComplete, onError){
+    var meta={
+      snippet:{ title:'여행 기록 영상 '+new Date().toLocaleDateString('ko-KR'), description:'둘이서 여행 다이어리에 올린 영상입니다.' },
+      status:{ privacyStatus:'unlisted' }
+    };
+    var initXhr=new XMLHttpRequest();
+    initXhr.open('POST','https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status');
+    initXhr.setRequestHeader('Authorization','Bearer '+ytAccessToken);
+    initXhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+    initXhr.setRequestHeader('X-Upload-Content-Length', file.size);
+    initXhr.setRequestHeader('X-Upload-Content-Type', file.type||'video/mp4');
+    initXhr.onload=function(){
+      if(initXhr.status<200 || initXhr.status>=300){
+        onError('업로드 시작에 실패했어요 (코드 '+initXhr.status+')');
+        return;
+      }
+      var uploadUrl=initXhr.getResponseHeader('Location');
+      if(!uploadUrl){ onError('업로드 주소를 받지 못했어요.'); return; }
+      var putXhr=new XMLHttpRequest();
+      putXhr.open('PUT', uploadUrl);
+      putXhr.setRequestHeader('Content-Type', file.type||'video/mp4');
+      putXhr.upload.onprogress=function(e){
+        if(e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100));
+      };
+      putXhr.onload=function(){
+        if(putXhr.status<200 || putXhr.status>=300){
+          onError('업로드가 끝까지 완료되지 않았어요 (코드 '+putXhr.status+')');
+          return;
+        }
+        try{
+          var data=JSON.parse(putXhr.responseText);
+          if(data && data.id) onComplete(data.id);
+          else onError('업로드 응답을 이해하지 못했어요.');
+        }catch(e){ onError('업로드 응답을 읽는 중 오류가 났어요.'); }
+      };
+      putXhr.onerror=function(){ onError('네트워크 문제로 업로드가 끊겼어요.'); };
+      putXhr.send(file);
+    };
+    initXhr.onerror=function(){ onError('업로드 시작 요청이 실패했어요.'); };
+    initXhr.send(JSON.stringify(meta));
+  }
+
+  function startYoutubeAutoUpload(file){
+    ytUploading=true; chosenYoutubeId=null;
+    ytUploadStatus.style.display='block';
+    ytUploadStatus.textContent='유튜브 권한 확인 중...';
+    checkSubmit();
+    ensureYoutubeAuth(function(){
+      ytUploadStatus.textContent='유튜브 업로드 중... 0%';
+      uploadVideoToYoutube(file, function(pct){
+        ytUploadStatus.textContent='유튜브 업로드 중... '+pct+'%';
+      }, function(videoId){
+        chosenYoutubeId=videoId;
+        ytUploading=false;
+        ytUploadStatus.textContent='유튜브 업로드 완료';
+        checkSubmit();
+      }, function(msg){
+        ytUploading=false;
+        ytUploadStatus.textContent='업로드 실패: '+msg;
+        checkSubmit();
+      });
+    }, function(msg){
+      ytUploading=false;
+      ytUploadStatus.textContent=msg;
+      checkSubmit();
+    });
+  }
+
+  fileInput.addEventListener('change',function(){
+    var f=fileInput.files[0];
+    if(!f) return;
+    chosenIsVideo=f.type.indexOf('video')===0;
+    chosenURL=URL.createObjectURL(f);
+    chosenRatio=null; chosenCompressed=null; chosenYoutubeId=null;
+    ytUploadStatus.style.display='none';
+    dropZone.classList.add('has-file');
+    dropPreview.innerHTML='';
+    if(chosenIsVideo){
+      var v=document.createElement('video'); v.src=chosenURL; v.muted=true; v.setAttribute('playsinline','');
+      v.addEventListener('loadedmetadata',function(){
+        chosenRatio=v.videoWidth+'/'+v.videoHeight;
+        v.style.aspectRatio=chosenRatio;
+      });
+      dropPreview.appendChild(v);
+      if(isYoutubeConfigured){ startYoutubeAutoUpload(f); }
+    } else {
+      var img=document.createElement('img'); img.src=chosenURL; img.alt='';
+      img.addEventListener('load',function(){
+        chosenRatio=img.naturalWidth+'/'+img.naturalHeight;
+        img.style.aspectRatio=chosenRatio;
+        var maxDim=1280;
+        var scale=Math.min(1,maxDim/Math.max(img.naturalWidth,img.naturalHeight));
+        var cw=Math.round(img.naturalWidth*scale), ch=Math.round(img.naturalHeight*scale);
+        var canvas=document.createElement('canvas'); canvas.width=cw; canvas.height=ch;
+        var ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,cw,ch);
+        try{
+          chosenCompressed=canvas.toDataURL('image/jpeg',0.75);
+          if(chosenCompressed.length>700000){ chosenCompressed=canvas.toDataURL('image/jpeg',0.5); }
+          if(chosenCompressed.length>700000){ chosenCompressed=canvas.toDataURL('image/jpeg',0.35); }
+          if(chosenCompressed.length>900000){ chosenCompressed=null; }
+        }catch(e){ chosenCompressed=null; }
+      });
+      dropPreview.appendChild(img);
+    }
+    checkSubmit();
+  });
+
+  function resetDrop(){
+    dropZone.classList.remove('has-file');
+    dropPreview.innerHTML=iconCamera()+'<div>사진 또는 동영상 직접 선택</div>';
+    chosenURL=null; chosenIsVideo=false; chosenRatio=null; chosenCompressed=null; chosenYoutubeId=null; ytUploading=false; fileInput.value='';
+    ytUploadStatus.style.display='none'; ytUploadStatus.textContent='';
+    ytInput.value=''; ytError.style.display='none';
+    if(verticalToggle) verticalToggle.checked=false;
+  }
+  function checkSubmit(){
+    submitBtn.disabled = capInput.value.trim().length===0 || ytUploading;
+    submitBtn.textContent = ytUploading ? '업로드 중...' : (editingId?'수정 완료':'기록 남기기');
+  }
+  capInput.addEventListener('input',checkSubmit);
+
+  submitBtn.addEventListener('click',function(){
+    if(editingId){
+      var newYtRaw=ytInput.value.trim();
+      var newYtId=newYtRaw?extractYouTubeId(newYtRaw):null;
+      if(newYtRaw && !newYtId){ ytError.style.display='block'; return; }
+      ytError.style.display='none';
+      var finalNewYtId=newYtId||chosenYoutubeId;
+      var newIsShorts=(newYtRaw?isYouTubeShorts(newYtRaw):false) || (verticalToggle && verticalToggle.checked);
+      if(!newIsShorts && chosenYoutubeId && chosenRatio){
+        var erp=chosenRatio.split('/');
+        if(erp.length===2 && Number(erp[1])>Number(erp[0])) newIsShorts=true;
+      }
+
+      var idx=ALL_POSTS.findIndex(function(x){ return x.id===editingId; });
+      if(idx>-1){
+        var p=ALL_POSTS[idx];
+        p.loc=locInput.value.trim()||'위치 미정';
+        p.caption=capInput.value.trim();
+        var newMediaURL=null;
+        if(finalNewYtId){
+          p.youtubeId=finalNewYtId; p.isVideo=true; p.mediaData=null; p.shorts=newIsShorts; p.ratio=newIsShorts?'9/16':'16/9';
+        } else if(chosenCompressed){
+          p.mediaData=chosenCompressed; p.youtubeId=null; p.isVideo=false; p.shorts=false; p.ratio=chosenRatio||p.ratio;
+          newMediaURL=chosenURL;
+        } else if(chosenIsVideo){
+          p.mediaData=null; p.youtubeId=null; p.isVideo=true; p.shorts=false; p.ratio=chosenRatio||'4/5';
+          newMediaURL=chosenURL;
+        } else if(editingMediaCleared){
+          p.mediaData=null; p.youtubeId=null; p.isVideo=false; p.shorts=false;
+        }
+        if(isConfigured){
+          var saveData={loc:p.loc,caption:p.caption,youtubeId:p.youtubeId,isVideo:p.isVideo,shorts:p.shorts||false,mediaData:p.mediaData,ratio:p.ratio};
+          updateDoc(doc(db,'posts',editingId), saveData).catch(function(err){ console.error('수정 실패',err); });
+        }
+        if(editingCardEl){
+          var freshCard=buildCard(Object.assign({},p,{mediaURL:newMediaURL}), false);
+          editingCardEl.replaceWith(freshCard);
+        }
+      }
+      locInput.value=''; capInput.value=''; resetDrop(); checkSubmit();
+      closeUpload();
+      return;
+    }
+
+    var ytRaw=ytInput.value.trim();
+    var ytId=ytRaw?extractYouTubeId(ytRaw):null;
+    if(ytRaw && !ytId){ ytError.style.display='block'; return; }
+    ytError.style.display='none';
+    var finalYtId=ytId||chosenYoutubeId;
+    var isShorts=(ytRaw?isYouTubeShorts(ytRaw):false) || (verticalToggle && verticalToggle.checked);
+    if(!isShorts && chosenYoutubeId && chosenRatio){
+      var rp=chosenRatio.split('/');
+      if(rp.length===2 && Number(rp[1])>Number(rp[0])) isShorts=true;
+    }
+
+    var id='p'+Date.now()+Math.random().toString(36).slice(2,8);
+    var loc=locInput.value.trim()||'위치 미정';
+    var caption=capInput.value.trim();
+    var createdAt=Date.now();
+    var isVideo=finalYtId?true:chosenIsVideo;
+    var ratio=finalYtId?(isShorts?'9/16':'16/9'):chosenRatio;
+    var mediaData=(!finalYtId && !chosenIsVideo && chosenCompressed)?chosenCompressed:null;
+
+    var newPost={id:id,loc:loc,caption:caption,createdAt:createdAt,isVideo:isVideo,youtubeId:finalYtId||null,shorts:isShorts,ratio:ratio,mediaData:mediaData};
+    var displayPost={id:id,loc:loc,caption:caption,createdAt:createdAt,isVideo:isVideo,youtubeId:finalYtId||null,shorts:isShorts,ratio:ratio,mediaURL:finalYtId?null:chosenURL,mediaData:mediaData};
+
+    var card=buildCard(displayPost,true);
+    feed.insertBefore(card,feed.firstChild);
+    ALL_POSTS.unshift(newPost);
+    locInput.value=''; capInput.value=''; resetDrop(); checkSubmit();
+    closeUpload();
+    card.scrollIntoView({behavior:'smooth',block:'start'});
+
+    if(isConfigured){
+      setDoc(doc(db,'posts',id), newPost).catch(function(err){ console.error('저장 실패',err); });
+    }
+  });
+})();
+});
+</script>
+</body>
+</html>
