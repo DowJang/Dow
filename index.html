@@ -161,6 +161,9 @@
       <label class="field" for="ytInput">유튜브 영상 링크</label>
       <input type="text" id="ytInput" placeholder="https://youtu.be/...">
       <p class="field-error" id="ytError" style="display:none;">링크를 확인해주세요</p>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);margin:12px 2px 0;cursor:pointer;">
+        <input type="checkbox" id="verticalToggle" style="width:auto;flex:none;"> 세로형(쇼츠·세로 영상)으로 표시
+      </label>
     </div>
     <label class="field" for="locInput">어디였나요?</label>
     <input type="text" id="locInput" placeholder="예: 포르투갈 · 리스보아">
@@ -466,6 +469,7 @@ initFirebase().then(function(){
       dropPreview.appendChild(img);
     }
     removeMediaBtn.style.display=(p.youtubeId||p.mediaData)?'':'none';
+    if(verticalToggle) verticalToggle.checked=!!p.shorts;
     checkSubmit();
     openUpload();
   }
@@ -498,6 +502,7 @@ initFirebase().then(function(){
   var dropZone=document.getElementById('dropZone');
   var dropPreview=document.getElementById('dropPreview');
   var ytInput=document.getElementById('ytInput');
+  var verticalToggle=document.getElementById('verticalToggle');
   var ytError=document.getElementById('ytError');
   var ytUploadStatus=document.getElementById('ytUploadStatus');
   var locInput=document.getElementById('locInput');
@@ -673,6 +678,7 @@ initFirebase().then(function(){
     chosenURL=null; chosenIsVideo=false; chosenRatio=null; chosenCompressed=null; chosenYoutubeId=null; ytUploading=false; fileInput.value='';
     ytUploadStatus.style.display='none'; ytUploadStatus.textContent='';
     ytInput.value=''; ytError.style.display='none';
+    if(verticalToggle) verticalToggle.checked=false;
   }
   function checkSubmit(){
     submitBtn.disabled = capInput.value.trim().length===0 || ytUploading;
@@ -687,7 +693,7 @@ initFirebase().then(function(){
       if(newYtRaw && !newYtId){ ytError.style.display='block'; return; }
       ytError.style.display='none';
       var finalNewYtId=newYtId||chosenYoutubeId;
-      var newIsShorts=newYtRaw?isYouTubeShorts(newYtRaw):false;
+      var newIsShorts=(newYtRaw?isYouTubeShorts(newYtRaw):false) || (verticalToggle && verticalToggle.checked);
       if(!newIsShorts && chosenYoutubeId && chosenRatio){
         var erp=chosenRatio.split('/');
         if(erp.length===2 && Number(erp[1])>Number(erp[0])) newIsShorts=true;
@@ -729,7 +735,7 @@ initFirebase().then(function(){
     if(ytRaw && !ytId){ ytError.style.display='block'; return; }
     ytError.style.display='none';
     var finalYtId=ytId||chosenYoutubeId;
-    var isShorts=ytRaw?isYouTubeShorts(ytRaw):false;
+    var isShorts=(ytRaw?isYouTubeShorts(ytRaw):false) || (verticalToggle && verticalToggle.checked);
     if(!isShorts && chosenYoutubeId && chosenRatio){
       var rp=chosenRatio.split('/');
       if(rp.length===2 && Number(rp[1])>Number(rp[0])) isShorts=true;
