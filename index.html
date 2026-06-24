@@ -190,7 +190,7 @@
       </label>
     </div>
     <label class="field" for="locInput">어디였나요?</label>
-    <input type="text" id="locInput" placeholder="예: 포르투갈 · 리스보아">
+    <input type="text" id="locInput" placeholder="예: 미국, LA">
     <label class="field" for="capInput">짧은 한마디</label>
     <textarea id="capInput" placeholder="이 순간을 한 줄로 남겨보세요"></textarea>
     <p id="mediaHint" style="font-size:12px;color:var(--ink-soft);margin:10px 2px 0;">사진과 유튜브 링크는 그대로 저장돼요. 동영상을 직접 선택하면 지금 화면에서만 보이고, 새로고침하면 글과 위치만 남아요.</p>
@@ -260,7 +260,8 @@ initFirebase().then(function(){
 
   function extractCountry(loc){
     if(!loc) return '위치 미정';
-    var sep=loc.indexOf('·');
+    var sep=loc.indexOf(',');
+    if(sep===-1) sep=loc.indexOf('·');
     if(sep===-1) sep=loc.indexOf('·');
     if(sep>-1) return loc.substring(0,sep).trim();
     return loc.trim();
@@ -374,15 +375,15 @@ initFirebase().then(function(){
   function defaultSeeds(){
     var now=Date.now(), day=86400000, hour=3600000;
     return [
-      {id:'seed1',loc:'포르투갈 · 리스보아',caption:'노란 트램과 골목길, 둘이 걷기 딱 좋은 날이었다.',isVideo:false,ratio:'4/5',createdAt:now-6*hour,mediaData:null,youtubeId:null},
-      {id:'seed2',loc:'스페인 · 세비야',caption:'플라멩고 공연, 박수 소리가 아직도 귀에 남아있다.',isVideo:true,ratio:'16/9',createdAt:now-3*day,mediaData:null,youtubeId:null},
-      {id:'seed3',loc:'모로코 · 마라케시',caption:'시장 골목에서 길을 잃었지만, 그게 오히려 더 좋았다.',isVideo:false,ratio:'4/5',createdAt:now-7*day,mediaData:null,youtubeId:null},
-      {id:'seed4',loc:'아이슬란드 · 비크',caption:'검은 모래 해변, 바람이 정말 거셌다.',isVideo:false,ratio:'16/9',createdAt:now-14*day,mediaData:null,youtubeId:null},
-      {id:'seed5',loc:'일본 · 교토',caption:'이른 아침 대나무 숲길, 둘이서만 걷는 기분이었다.',isVideo:true,ratio:'4/5',createdAt:now-21*day,mediaData:null,youtubeId:null},
-      {id:'seed6',loc:'이탈리아 · 친퀘테레',caption:'파스텔 마을과 바다, 사진보다 실제가 더 예뻤다.',isVideo:false,ratio:'16/9',createdAt:now-30*day,mediaData:null,youtubeId:null},
-      {id:'seed7',loc:'태국 · 치앙마이',caption:'코끼리 보호구역에서 보낸 하루, 마음이 따뜻했다.',isVideo:false,ratio:'4/5',createdAt:now-31*day,mediaData:null,youtubeId:null},
-      {id:'seed8',loc:'페루 · 마추픽추',caption:'새벽 안개가 걷히던 순간, 말이 필요 없었다.',isVideo:false,ratio:'16/9',createdAt:now-60*day,mediaData:null,youtubeId:null},
-      {id:'seed9',loc:'그리스 · 산토리니',caption:'노을이 질 때마다 사람들이 약속한 듯 멈춰섰다.',isVideo:true,ratio:'4/5',createdAt:now-61*day,mediaData:null,youtubeId:null}
+      {id:'seed1',loc:'포르투갈, 리스보아',caption:'노란 트램과 골목길, 둘이 걷기 딱 좋은 날이었다.',isVideo:false,ratio:'4/5',createdAt:now-6*hour,mediaData:null,youtubeId:null},
+      {id:'seed2',loc:'스페인, 세비야',caption:'플라멩고 공연, 박수 소리가 아직도 귀에 남아있다.',isVideo:true,ratio:'16/9',createdAt:now-3*day,mediaData:null,youtubeId:null},
+      {id:'seed3',loc:'모로코, 마라케시',caption:'시장 골목에서 길을 잃었지만, 그게 오히려 더 좋았다.',isVideo:false,ratio:'4/5',createdAt:now-7*day,mediaData:null,youtubeId:null},
+      {id:'seed4',loc:'아이슬란드, 비크',caption:'검은 모래 해변, 바람이 정말 거셌다.',isVideo:false,ratio:'16/9',createdAt:now-14*day,mediaData:null,youtubeId:null},
+      {id:'seed5',loc:'일본, 교토',caption:'이른 아침 대나무 숲길, 둘이서만 걷는 기분이었다.',isVideo:true,ratio:'4/5',createdAt:now-21*day,mediaData:null,youtubeId:null},
+      {id:'seed6',loc:'이탈리아, 친퀘테레',caption:'파스텔 마을과 바다, 사진보다 실제가 더 예뻤다.',isVideo:false,ratio:'16/9',createdAt:now-30*day,mediaData:null,youtubeId:null},
+      {id:'seed7',loc:'태국, 치앙마이',caption:'코끼리 보호구역에서 보낸 하루, 마음이 따뜻했다.',isVideo:false,ratio:'4/5',createdAt:now-31*day,mediaData:null,youtubeId:null},
+      {id:'seed8',loc:'페루, 마추픽추',caption:'새벽 안개가 걷히던 순간, 말이 필요 없었다.',isVideo:false,ratio:'16/9',createdAt:now-60*day,mediaData:null,youtubeId:null},
+      {id:'seed9',loc:'그리스, 산토리니',caption:'노을이 질 때마다 사람들이 약속한 듯 멈춰섰다.',isVideo:true,ratio:'4/5',createdAt:now-61*day,mediaData:null,youtubeId:null}
     ];
   }
 
