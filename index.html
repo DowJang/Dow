@@ -34,7 +34,18 @@
   .icon-btn svg{width:18px;height:18px;}
   .stripe{height:2px;background:var(--accent);}
 
-  
+  .region-filter{position:relative;padding:10px 16px 2px;}
+  .region-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;border:1px solid var(--line);background:var(--card);font-family:var(--sans);font-size:13px;color:var(--ink-soft);cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .region-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .region-btn.filtered{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .region-btn svg{width:12px;height:12px;flex:none;transition:transform .15s;}
+  .region-btn.open svg{transform:rotate(180deg);}
+  .region-list{display:none;position:absolute;left:16px;right:16px;top:100%;margin-top:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.1);z-index:15;max-height:50vh;overflow-y:auto;padding:6px 0;}
+  .region-list.open{display:block;}
+  .region-item{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;font-family:var(--sans);font-size:14px;color:var(--ink);cursor:pointer;border:none;background:none;width:100%;text-align:left;}
+  .region-item:hover{background:var(--paper);}
+  .region-item.active{color:var(--accent);font-weight:700;}
+  .region-item .ri-count{font-size:12px;color:var(--ink-soft);font-weight:400;}
 
   main{padding-top:6px;}
   .feed{display:flex;flex-direction:column;gap:20px;padding:18px 0 22px;}
@@ -96,6 +107,8 @@
   @media (min-width:600px){
     .wrap{max-width:920px;padding:0 24px;}
     .head-row{padding:18px 0 12px;}
+    .region-filter{padding:10px 0 2px;}
+    .region-list{left:0;right:auto;min-width:220px;}
     .sentinel{padding:16px 0 6px;}
     .postcard{border:1px solid var(--line);border-radius:var(--radius);}
     .media.portrait{width:80%;max-width:520px;}
@@ -111,6 +124,13 @@
       <span class="logo">현도 지은 세계여행 중</span>
     </div>
     <div class="stripe"></div>
+    <div class="region-filter" id="regionFilter">
+      <button class="region-btn" id="regionBtn" type="button">
+        지역별
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="region-list" id="regionList"></div>
+    </div>
   </header>
 
   <main>
@@ -228,10 +248,87 @@ function initFirebase(){
 initFirebase().then(function(){
 (function(){
   var ALL_POSTS=[];
+  var FILTERED_POSTS=[];
+  var activeCountry=null;
   var BATCH=3, shown=0;
   var feed=document.getElementById('feed');
   var sentinel=document.getElementById('sentinel');
   var sentinelText=document.getElementById('sentinelText');
+  var countryTabsEl=document.getElementById('regionFilter');
+  var regionBtn=document.getElementById('regionBtn');
+  var regionList=document.getElementById('regionList');
+
+  function extractCountry(loc){
+    if(!loc) return '위치 미정';
+    var sep=loc.indexOf('·');
+    if(sep===-1) sep=loc.indexOf('·');
+    if(sep>-1) return loc.substring(0,sep).trim();
+    return loc.trim();
+  }
+
+  function buildCountryTabs(){
+    var counts={};
+    ALL_POSTS.forEach(function(p){
+      var c=extractCountry(p.loc);
+      counts[c]=(counts[c]||0)+1;
+    });
+    var countries=Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+    if(countries.length<2){ countryTabsEl.style.display='none'; return; }
+    countryTabsEl.style.display='';
+    regionBtn.className='region-btn'+(activeCountry!==null?' filtered':'');
+    regionBtn.innerHTML=(activeCountry||'지역별')+' <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    regionList.innerHTML='';
+    var allItem=document.createElement('button'); allItem.type='button';
+    allItem.className='region-item'+(activeCountry===null?' active':'');
+    allItem.innerHTML='전체 <span class="ri-count">'+ALL_POSTS.length+'</span>';
+    allItem.addEventListener('click',function(){ closeRegionList(); applyFilter(null); });
+    regionList.appendChild(allItem);
+    countries.forEach(function(c){
+      var item=document.createElement('button'); item.type='button';
+      item.className='region-item'+(activeCountry===c?' active':'');
+      item.innerHTML=c+' <span class="ri-count">'+counts[c]+'</span>';
+      item.addEventListener('click',function(){ closeRegionList(); applyFilter(c); });
+      regionList.appendChild(item);
+    });
+  }
+
+  function closeRegionList(){ regionList.classList.remove('open'); regionBtn.classList.remove('open'); }
+  regionBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var isOpen=regionList.classList.contains('open');
+    if(isOpen){ closeRegionList(); } else { regionList.classList.add('open'); regionBtn.classList.add('open'); }
+  });
+  document.addEventListener('click',function(e){
+    if(!regionList.contains(e.target) && e.target!==regionBtn) closeRegionList();
+  });
+
+  function applyFilter(country){
+    activeCountry=country;
+    FILTERED_POSTS=country===null?ALL_POSTS.slice():ALL_POSTS.filter(function(p){ return extractCountry(p.loc)===country; });
+    feed.innerHTML='';
+    shown=0;
+    var ic=document.getElementById('sentinelIcon');
+    if(!ic){
+      var svgNs='http://www.w3.org/2000/svg';
+      var svg=document.createElementNS(svgNs,'svg');
+      svg.setAttribute('id','sentinelIcon');
+      svg.setAttribute('viewBox','0 0 24 24');
+      svg.setAttribute('fill','none');
+      svg.setAttribute('stroke','currentColor');
+      svg.setAttribute('stroke-width','2');
+      svg.setAttribute('stroke-linecap','round');
+      svg.setAttribute('stroke-linejoin','round');
+      var pl=document.createElementNS(svgNs,'polyline');
+      pl.setAttribute('points','6 9 12 15 18 9');
+      svg.appendChild(pl);
+      sentinel.insertBefore(svg,sentinelText);
+    }
+    sentinelText.textContent='스크롤하면 지난 기록이 이어져요';
+    loadMore();
+    observer.disconnect();
+    observer.observe(sentinel);
+    buildCountryTabs();
+  }
 
   function iconCamera(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.4-2.4h5.2L16 7"/><circle cx="12" cy="13.5" r="3.2"/></svg>';}
   function iconPlay(){return '<svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20" fill="currentColor"/></svg>';}
@@ -358,17 +455,17 @@ initFirebase().then(function(){
   }
 
   function loadMore(){
-    var next=ALL_POSTS.slice(shown,shown+BATCH);
+    var next=FILTERED_POSTS.slice(shown,shown+BATCH);
     next.forEach(function(p){ feed.appendChild(buildCard(p,false)); });
     shown+=next.length;
-    if(shown>=ALL_POSTS.length){
+    if(shown>=FILTERED_POSTS.length){
       var ic=document.getElementById('sentinelIcon'); if(ic) ic.remove();
       sentinelText.textContent='처음 기록까지 다 둘러보셨어요';
       observer.disconnect();
     }
   }
   var observer=new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting && shown<ALL_POSTS.length){ setTimeout(loadMore,200); }
+    if(entries[0].isIntersecting && shown<FILTERED_POSTS.length){ setTimeout(loadMore,200); }
   },{rootMargin:'200px'});
 
   function fetchAllPosts(){
@@ -402,7 +499,9 @@ initFirebase().then(function(){
     ready.then(function(posts){
       posts.sort(function(a,b){ return b.createdAt-a.createdAt; });
       ALL_POSTS=posts;
+      FILTERED_POSTS=posts.slice();
       var lm=document.getElementById('loadingMsg'); if(lm) lm.remove();
+      buildCountryTabs();
       loadMore();
       observer.observe(sentinel);
     });
@@ -492,10 +591,13 @@ initFirebase().then(function(){
     cardEl.remove();
     var idx=ALL_POSTS.findIndex(function(x){ return x.id===p.id; });
     if(idx>-1) ALL_POSTS.splice(idx,1);
+    var fi=FILTERED_POSTS.findIndex(function(x){ return x.id===p.id; });
+    if(fi>-1) FILTERED_POSTS.splice(fi,1);
     shown=Math.max(0,shown-1);
     if(isConfigured){
       deleteDoc(doc(db,'posts',p.id)).catch(function(){});
     }
+    buildCountryTabs();
   }
 
   function openUpload(){ overlay.classList.add('open'); }
@@ -736,6 +838,7 @@ initFirebase().then(function(){
       }
       locInput.value=''; capInput.value=''; resetDrop(); checkSubmit();
       closeUpload();
+      buildCountryTabs();
       return;
     }
 
@@ -761,12 +864,26 @@ initFirebase().then(function(){
     var newPost={id:id,loc:loc,caption:caption,createdAt:createdAt,isVideo:isVideo,youtubeId:finalYtId||null,shorts:isShorts,ratio:ratio,mediaData:mediaData};
     var displayPost={id:id,loc:loc,caption:caption,createdAt:createdAt,isVideo:isVideo,youtubeId:finalYtId||null,shorts:isShorts,ratio:ratio,mediaURL:finalYtId?null:chosenURL,mediaData:mediaData};
 
-    var card=buildCard(displayPost,true);
-    feed.insertBefore(card,feed.firstChild);
     ALL_POSTS.unshift(newPost);
+    if(activeCountry!==null){
+      activeCountry=null;
+      FILTERED_POSTS=ALL_POSTS.slice();
+      feed.innerHTML='';
+      shown=0;
+      buildCountryTabs();
+      loadMore();
+      observer.disconnect();
+      observer.observe(sentinel);
+    } else {
+      FILTERED_POSTS.unshift(newPost);
+      var card=buildCard(displayPost,true);
+      feed.insertBefore(card,feed.firstChild);
+      shown+=1;
+      buildCountryTabs();
+    }
     locInput.value=''; capInput.value=''; resetDrop(); checkSubmit();
     closeUpload();
-    card.scrollIntoView({behavior:'smooth',block:'start'});
+    feed.firstChild && feed.firstChild.scrollIntoView({behavior:'smooth',block:'start'});
 
     if(isConfigured){
       setDoc(doc(db,'posts',id), newPost).catch(function(err){ console.error('저장 실패',err); });
